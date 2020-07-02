@@ -47,7 +47,7 @@ ui <- fluidPage(
         mainPanel(plotOutput("histo"),
                   dataTableOutput("reponses"))
     )),
-    tabPanel("Global"),
+    tabPanel("Global",
     titlePanel("Evaluation Cefim Global"),
     
     sidebarLayout(
@@ -62,7 +62,7 @@ ui <- fluidPage(
                   dataTableOutput("txtQestion"))
     )
 
-    ))
+    )))
 
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
