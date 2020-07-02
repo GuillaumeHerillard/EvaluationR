@@ -15,7 +15,7 @@ library(lubridate)
 ui <- fluidPage(
     tabsetPanel(
         tabPanel("Etudiant",
-    titlePanel("Evaluation"),
+    titlePanel("Evaluation Cefim par Etudiant"),
     
     sidebarLayout(
         sidebarPanel(
@@ -47,7 +47,22 @@ ui <- fluidPage(
         mainPanel(plotOutput("histo"),
                   dataTableOutput("reponses"))
     )),
-    tabPanel("Global")))
+    tabPanel("Global"),
+    titlePanel("Evaluation Cefim Global"),
+    
+    sidebarLayout(
+        sidebarPanel(selectInput(
+            "questionId",
+            "Choisissez votre question",
+            c(unique(quest_rep$libelle)[4:46])
+        ),),
+        
+        
+        mainPanel(plotOutput("histoglobal"),
+                  dataTableOutput("txtQestion"))
+    )
+
+    ))
 
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
@@ -95,6 +110,33 @@ server <- function(input, output,session) {
         # generate bins based on input$bins from ui.R
         df() %>%
             select("libelle", "reponse")
+    })
+    dfbis <- reactive({
+        quest_rep %>%
+            filter(libelle == input$questionId)
+        
+    })
+    
+    output$histoglobal <- renderPlot({
+        dfbis() %>%
+            filter(type == "score") %>%
+            ggplot() +
+            geom_bar(aes(
+                x = factor(reponse),
+                y = stat(prop),
+                fill = stat(prop),
+                group = 1
+            ), width = 0.5) +
+            labs(x = "Notes",
+                 y = "Pourcentage")
+        
+    })
+    
+    output$txtQestion <- renderDataTable({
+        dfbis() %>%
+            filter(type == "texte_long" | type == "texte_long") %>%
+            select(nom_prenom,reponse) %>%
+            unique()
     })
 }
 
